@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +22,13 @@ public class QuestionController {
 
     // 질문 추가 (POST)
     @PostMapping("/sign")
-    public ResponseEntity<Question> createQuestion(@RequestBody Question question) {
+    public int createQuestion(@RequestBody Question question) {
         // 요청 받은 데이터 로그 출력
         System.out.println("Received Question: " + question.getUsername() + ", " + question.getPassword());
          Question user=encoder.registerUser(question.getUsername(), question.getPassword());
         
         Question savedQuestion = questionRepository.save(user); // DB에 저장
-        return new ResponseEntity<>(savedQuestion, HttpStatus.CREATED); // 저장된 데이터 반환
+        return 0; // 저장된 데이터 반환
     }
     @PostMapping("/login")  // "/hello" URL로 접근 시 이 메소드가 실행됩니다.
     public int sayHello(@RequestBody Question question) {
@@ -35,5 +37,14 @@ public class QuestionController {
     	if(k==true) {a=0;}
     	else if(k==false) {a=1;}
         return a;  // resources/templates/hello.html 파일을 찾아서 반환
+    }
+    @PostMapping("/check")  // "/hello" URL로 접근 시 이 메소드가 실행됩니다.
+    public int check(@RequestBody Question question) {
+    	Optional<Question> k=questionRepository.findByUsername(question.getUsername());
+    	if (k.isPresent()) {
+            return 1;  
+        } else {
+            return 0; 
+        } 
     }
 }

@@ -1,5 +1,6 @@
 package com.example.basicapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -47,10 +48,18 @@ public class example1 extends AppCompatActivity {
                 }).start();
             }
         });
+        Button sign_button = (Button) findViewById(R.id.button2);
+        sign_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent1 = new Intent(getApplicationContext(),sign.class);
+                startActivity(intent1);
+            }
+        });
     }
 
     private void sendPostRequest() {
-        String urlString = "http://222.107.221.139:8080/api/question/login";  // 서버 URL (비워둠)
+        String urlString = "http://" + getString(R.string.server_ip) + ":8080/api/question/login";;  // 서버 URL (비워둠)
         String username = emailEditText.getText().toString().trim();  // 이메일 입력값
         String password = passwordEditText.getText().toString().trim();  // 비밀번호 입력값
 
