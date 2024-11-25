@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">basicapp</string>
+    <string name="hint_password">비밀번호를 입력하세요</string>
+    <string name="hint_email">이메일을 입력하세요</string>
+    <string name="text_login">로그인</string>
+    <string name="text_sign">회원가입</string>
+    <string name="password">password</string>
+    <string name="email">E-mail</string>
+</resources>
