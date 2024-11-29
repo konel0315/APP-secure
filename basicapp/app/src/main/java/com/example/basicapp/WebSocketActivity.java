@@ -68,7 +68,7 @@ public class WebSocketActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     try {
-                        appendMessage("Server: " + text);
+                        appendMessage(text);
                         dbHelper.saveMessage("Not You", text);
                     } catch (Exception e) {
                         Log.e(TAG, "Error processing message: " + e.getMessage());
@@ -96,12 +96,13 @@ public class WebSocketActivity extends AppCompatActivity {
             String message = edtMessage.getText().toString();
             if (!message.isEmpty() && webSocket != null) {
                 JSONObject jsonMessage = new JSONObject();
+                String user = tokenStorage.getUsername();
                 try {
                     jsonMessage.put("type", "chat");
+                    jsonMessage.put("username", user);
                     jsonMessage.put("message", message);
                     dbHelper.saveMessage("You", message);
                     webSocket.send(jsonMessage.toString());
-                    appendMessage("You: " + message);
                     edtMessage.setText("");
                 } catch (JSONException e) {
                     Log.e(TAG, "Failed to create JSON: " + e.getMessage());

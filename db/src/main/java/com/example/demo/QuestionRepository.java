@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface QuestionRepository extends JpaRepository<Question, Integer>{
 	Optional<Question> findByUsername(String username);
-	//@Query("SELECT u.username FROM Question u WHERE u.username != :username ORDER BY FUNCTION('RAND')")
-	@Query("SELECT u.username FROM Question u ORDER BY FUNCTION('RAND')")
+	//@Query("SELECT u.username FROM Question u WHERE u.username != :username ORDER BY FUNCTION('RAND') LIMIT 1")
+	@Query("SELECT u.username FROM Question u ORDER BY FUNCTION('RAND') LIMIT 1")
     String findRandomUsername(@Param("username") String username);
 }
