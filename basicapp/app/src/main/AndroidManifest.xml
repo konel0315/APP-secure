@@ -26,10 +26,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".example1">
+            android:name=".login">
         </activity>
         <activity
             android:name=".sign">
+        </activity>
+        <activity
+            android:name=".WebSocketActivity">
+        </activity>
+        <activity
+            android:name=".logout">
         </activity>
     </application>
 

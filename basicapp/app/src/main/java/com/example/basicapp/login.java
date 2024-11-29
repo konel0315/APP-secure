@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-
+import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -19,11 +19,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class example1 extends AppCompatActivity {
-
+public class login extends AppCompatActivity {
     private EditText emailEditText;
     private EditText passwordEditText;
 
+    private TokenStorage tokenStorage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +33,7 @@ public class example1 extends AppCompatActivity {
         // 입력 칸 초기화
         emailEditText = findViewById(R.id.editTextTextEmailAddress);  // 이메일 입력칸 ID
         passwordEditText = findViewById(R.id.editTextTextPassword);  // 비밀번호 입력칸 ID
-
+        tokenStorage = new TokenStorage(this);
         // 로그인 버튼 초기화
         Button loginButton = findViewById(R.id.button);  // 로그인 버튼 ID
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -99,17 +99,28 @@ public class example1 extends AppCompatActivity {
                 reader.close();
 
                 // 서버 응답을 확인하고, 성공 메시지 표시
-                if (response.toString().equals("0")) {
+                if (response.toString().equals("error")) {
                     // 응답이 "1"이면 Toast로 축하 메시지 출력
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(example1.this, "축하합니다", Toast.LENGTH_SHORT).show();
+
+                            Toast.makeText(login.this, "아이디 또는 비밀번호가 잘못되었습니다.", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {
                     // 응답이 0이 아닌 경우 다른 처리
-                    Log.e("PostRequestError", "서버 응답: " + response.toString());
+                    String responseBody = response.toString();  // 이 부분은 응답 객체를 JSON 문자열로 변환
+                    JSONObject jsonResponse = new JSONObject(responseBody);
+                    String token = jsonResponse.getString("token");  // 'token'이라는 키에서 값 추출
+                    String user = jsonResponse.getString("username");
+                    tokenStorage.saveToken(user,token);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            finish();  // 로그인 후 종료
+                        }
+                    });
                 }
             } else {
                 // 응답 실패

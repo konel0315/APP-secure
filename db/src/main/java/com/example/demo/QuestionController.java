@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +12,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/question") // 기본 URL
 public class QuestionController {
-
 	private final Encoder encoder;
     private final QuestionRepository questionRepository;
 
     @Autowired
     public QuestionController(QuestionRepository questionRepository,Encoder encoder) {
         this.questionRepository = questionRepository;
-        this.encoder = encoder;//'
+        this.encoder = encoder;
     }
 
     // 질문 추가 (POST)
@@ -27,17 +28,26 @@ public class QuestionController {
         System.out.println("Received Question: " + question.getUsername() + ", " + question.getPassword());
          Question user=encoder.registerUser(question.getUsername(), question.getPassword());
         
-        Question savedQuestion = questionRepository.save(user); // DB에 저장
+        questionRepository.save(user); // DB에 저장
         return 0; // 저장된 데이터 반환
     }
-    @PostMapping("/login")  // "/hello" URL로 접근 시 이 메소드가 실행됩니다.
-    public int sayHello(@RequestBody Question question) {
-    	boolean k=encoder.authenticate(question.getUsername(), question.getPassword());
-    	int a=-1;
-    	if(k==true) {a=0;}
-    	else if(k==false) {a=1;}
-        return a;  // resources/templates/hello.html 파일을 찾아서 반환
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Question question) {
+        boolean isAuthenticated = encoder.authenticate(question.getUsername(), question.getPassword());
+
+        if (isAuthenticated) {
+            String token = JwtT.generateToken(question.getUsername());
+            
+            Map<String, String> response = new HashMap<>();
+            response.put("username", question.getUsername());
+            response.put("token", token);
+
+            return ResponseEntity.ok(response); // 성공 시 JSON 형식으로 반환
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("error");
+        }
     }
+
     @PostMapping("/check")  // "/hello" URL로 접근 시 이 메소드가 실행됩니다.
     public int check(@RequestBody Question question) {
     	Optional<Question> k=questionRepository.findByUsername(question.getUsername());
@@ -47,4 +57,5 @@ public class QuestionController {
             return 0; 
         } 
     }
+    
 }

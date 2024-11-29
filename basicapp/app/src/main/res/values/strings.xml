@@ -9,5 +9,6 @@
     <string name="ID_input">아이디 입력</string>
     <string name="duplication">중복확인</string>
     <string name="password_input">비밀번호 입력</string>
-    <string name="server_ip">220.117.231.48</string>
+    <string name="logout">로그아웃</string>
+    <string name="server_ip">121.167.120.134</string>
 </resources>
