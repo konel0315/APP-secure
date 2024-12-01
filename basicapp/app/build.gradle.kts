@@ -41,4 +41,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 
     implementation ("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation ("com.github.iamport:iamport-rest-client-java:0.2.23")
 }

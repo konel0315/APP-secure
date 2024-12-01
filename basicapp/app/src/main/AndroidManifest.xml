@@ -37,6 +37,9 @@
         <activity
             android:name=".logout">
         </activity>
+        <activity
+            android:name=".card">
+        </activity>
     </application>
 
 </manifest>
