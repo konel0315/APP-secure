@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Component
 public class WebSocketHandlerImpl extends TextWebSocketHandler {
@@ -20,7 +19,8 @@ public class WebSocketHandlerImpl extends TextWebSocketHandler {
     // 방 관리 (roomId -> username 리스트)
     private static ConcurrentHashMap<String, List<String>> roomMap = new ConcurrentHashMap<>();
 
-    private static Random random = new Random();
+    // 사용자 카운트 (순차 매칭을 위해 사용)
+    private static int userCount = 0;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -44,37 +44,27 @@ public class WebSocketHandlerImpl extends TextWebSocketHandler {
     }
 
     /**
-     * 사용자를 방에 랜덤 배정
+     * 사용자를 방에 배정 (홀수/짝수 순서 기반)
      */
     private void assignUserToRoom(String username) {
-        // 현재 방에 여유가 있는지 확인
-        for (String roomId : roomMap.keySet()) {
-            List<String> users = roomMap.get(roomId);
-            if (users.size() < 2) { // 방에 빈자리가 있으면 추가
-                users.add(username);
-                System.out.println("User " + username + " joined room " + roomId);
-                return;
+        userCount++; // 사용자 수 증가
+
+        if (userCount % 2 == 1) { // 홀수 번째 사용자: 새로운 방 생성
+            String newRoomId = "room" + ((userCount / 2) + 1); // 예: room1, room2...
+            List<String> newRoom = new ArrayList<>();
+            newRoom.add(username);
+            roomMap.put(newRoomId, newRoom);
+            System.out.println("Created new room: " + newRoomId + " with user: " + username);
+        } else { // 짝수 번째 사용자: 이전 방에 입장
+            String lastRoomId = "room" + (userCount / 2); // 마지막 생성된 방에 추가
+            List<String> usersInRoom = roomMap.get(lastRoomId);
+            if (usersInRoom != null) {
+                usersInRoom.add(username);
+                System.out.println("User " + username + " joined room " + lastRoomId);
+            } else {
+                System.out.println("Error: Room not found for user " + username);
             }
         }
-
-        // 여유 있는 방이 없으면 새 방 생성
-        String newRoomId = "room" + (roomMap.size() + 1);
-        List<String> newRoom = new ArrayList<>();
-
-        // 랜덤으로 사용자 추가
-        List<String> availableUsers = new ArrayList<>(sessionMap.keySet());
-        availableUsers.remove(username); // 자신 제외
-
-        if (!availableUsers.isEmpty()) {
-            String randomUser = availableUsers.get(random.nextInt(availableUsers.size()));
-            newRoom.add(randomUser);
-            sessionMap.remove(randomUser); // 다른 방에 추가되었으니 제외
-            System.out.println("User " + randomUser + " added to room " + newRoomId);
-        }
-
-        newRoom.add(username); // 현재 유저도 추가
-        roomMap.put(newRoomId, newRoom); // 새로운 방 추가
-        System.out.println("Created new room: " + newRoomId + " with users: " + newRoom);
     }
 
     /**
